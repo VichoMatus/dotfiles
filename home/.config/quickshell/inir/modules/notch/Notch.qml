@@ -47,6 +47,7 @@ Scope {
                 width: face.width + 28
                 height: face.height
                 Region { item: statusArea }
+                Region { item: leftStatus }
             }
             property bool expanded: false
             property string levelKind: ""
@@ -98,7 +99,8 @@ Scope {
                     return JSON.stringify({visible: window.visible, expanded: window.expanded,
                         notification: window.notice !== null, dimmed: window.dimmed, shift: window.shift,
                         playing: window.playing, level: window.levelKind,
-                        batteryMenu: notchRoot.batteryScreen !== null})
+                        batteryMenu: notchRoot.batteryScreen !== null,
+                        monitoring: leftStatus.acquired, appCount: leftStatus.apps.length})
                 }
             }
             Timer {
@@ -140,6 +142,17 @@ Scope {
                     anchors.centerIn: parent; text: "♪"; color: "#cccccc"
                     visible: art.status !== Image.Ready
                 }
+            }
+            LeftStatus {
+                id: leftStatus
+                anchors.left: parent.left; anchors.leftMargin: 12
+                y: [0, 1, 2, 1][window.shift]
+                width: Math.min(implicitWidth, Math.max(0, window.width / 2 - face.width / 2 - 38))
+                height: 42
+                active: window.visible
+                screenName: window.modelData.name
+                opacity: window.dimmed && !leftHover.hovered ? 0.65 : 1
+                HoverHandler { id: leftHover; onHoveredChanged: if (hovered) window.wake() }
             }
             Item {
                 id: statusArea

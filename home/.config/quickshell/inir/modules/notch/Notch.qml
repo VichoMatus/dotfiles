@@ -7,13 +7,24 @@ import QtQuick.Controls as Controls
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import Quickshell.Services.UPower
 import qs
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
 import qs.modules.pill as Pill
+import qs.modules.notch
 
 Scope {
+    id: notchRoot
+    property var batteryScreen: null
+    LazyLoader {
+        active: notchRoot.batteryScreen !== null
+        component: BatteryMenu {
+            screen: notchRoot.batteryScreen
+            onDismissed: notchRoot.batteryScreen = null
+        }
+    }
     Pill.PillTrayMenu { id: trayMenu }
     Variants {
         model: Quickshell.screens
@@ -53,7 +64,7 @@ Scope {
                 interval: 125; running: window.playing; repeat: true
                 onTriggered: window.waveStep = (window.waveStep + 1) % 16
             }
-            onVisibleChanged: if (!visible) { expanded = false; levelKind = ""; levelTimer.stop(); if (trayMenu.hostWindow === window) trayMenu.close() }
+            onVisibleChanged: if (!visible) { expanded = false; levelKind = ""; levelTimer.stop(); if (trayMenu.hostWindow === window) trayMenu.close(); if (notchRoot.batteryScreen === window.modelData) notchRoot.batteryScreen = null }
             onExpandedChanged: if (expanded) closeTimer.restart(); else closeTimer.stop()
             onNoticeChanged: { dimmed = false; dimTimer.restart() }
             function wake() {
@@ -75,6 +86,11 @@ Scope {
             IpcHandler {
                 target: "notch-" + window.modelData.name
                 function toggle(): void { window.wake(); window.expanded = !window.expanded }
+                function menu(kind: string): void {
+                    if (!window.visible) return
+                    if (kind === "battery") notchRoot.batteryScreen = notchRoot.batteryScreen ? null : window.modelData
+                    else if (kind === "wifi") GlobalStates.openSidebarRight(window.modelData.name)
+                }
                 function status(): string {
                     return JSON.stringify({visible: window.visible, expanded: window.expanded,
                         notification: window.notice !== null, dimmed: window.dimmed, shift: window.shift,
@@ -149,21 +165,41 @@ Scope {
                     }
                     Item {
                         Layout.preferredWidth: 28; Layout.preferredHeight: 30
-                        MaterialSymbol {
-                            anchors.centerIn: parent; iconSize: 21; fill: 1
-                            text: Network.ethernet ? "lan" : Network.wifiEnabled ? "wifi" : "wifi_off"
-                            color: Network.wifiStatus === "connected" || Network.ethernet ? "#eeeeee" : "#999999"
+                        Item {
+                            anchors.centerIn: parent; width: 24; height: 20
+                            opacity: Network.wifiEnabled || Network.ethernet ? 1 : 0.45
+                            Shape {
+                                anchors.fill: parent
+                                ShapePath {
+                                    strokeWidth: 2.8; strokeColor: "#eeeeee"; fillColor: "transparent"; capStyle: ShapePath.RoundCap
+                                    PathSvg { path: "M 2 6 Q 12 -1 22 6" }
+                                }
+                                ShapePath {
+                                    strokeWidth: 2.8; strokeColor: "#eeeeee"; fillColor: "transparent"; capStyle: ShapePath.RoundCap
+                                    PathSvg { path: "M 5.5 10 Q 12 5.5 18.5 10" }
+                                }
+                                ShapePath {
+                                    strokeWidth: 2.8; strokeColor: "#eeeeee"; fillColor: "transparent"; capStyle: ShapePath.RoundCap
+                                    PathSvg { path: "M 9 14 Q 12 12 15 14" }
+                                }
+                            }
+                            Rectangle { width: 3; height: 3; radius: 1.5; x: 10.5; y: 17; color: "#eeeeee" }
                         }
                         MouseArea {
                             id: wifiMouse
                             anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                            onClicked: AppLauncher.launchNetworkSettings(Network.ethernet)
+                            onClicked: GlobalStates.openSidebarRight(window.modelData.name)
                         }
                         Controls.ToolTip.visible: wifiMouse.containsMouse
                         Controls.ToolTip.text: Network.connectionTooltip()
                     }
-                    RowLayout {
+                    Item {
                         visible: Battery.available
+                        Layout.preferredWidth: batteryRow.implicitWidth + 8
+                        Layout.preferredHeight: 30
+                    RowLayout {
+                        id: batteryRow
+                        anchors.centerIn: parent
                         spacing: 7
                         Text {
                             text: Math.round(Battery.percentage * 100) + "%"
@@ -172,17 +208,20 @@ Scope {
                         Item {
                             Layout.preferredWidth: 29; Layout.preferredHeight: 16
                             Rectangle {
-                                width: 25; height: 13; radius: 3
+                                width: 26; height: 13; radius: 3.5
                                 anchors.verticalCenter: parent.verticalCenter
-                                color: "transparent"; border.width: 1; border.color: "#bbbbbb"
+                                color: "transparent"; border.width: 1.2; border.color: "#eeeeee"
                                 Rectangle {
-                                    x: 3; y: 3; height: parent.height - 6; radius: 1
-                                    width: Math.max(0, (parent.width - 6) * Math.max(0, Math.min(1, Battery.percentage)))
-                                    color: Battery.isLowAndNotCharging ? "#ee7777" : "#eeeeee"
+                                    x: 2.5; y: 2.5; height: parent.height - 5; radius: 1.5
+                                    width: Math.max(0, (parent.width - 5) * Math.max(0, Math.min(1, Battery.percentage)))
+                                    color: Battery.isCharging ? "#73d58b" : PowerProfiles.profile === PowerProfile.PowerSaver ? "#f5cd54" : Battery.isLowAndNotCharging ? "#ee7777" : "#eeeeee"
                                 }
-                                MaterialSymbol {
-                                    anchors.centerIn: parent; iconSize: 12; fill: 1
-                                    text: "bolt"; visible: Battery.isCharging; color: "#73bb91"
+                                Shape {
+                                    anchors.centerIn: parent; width: 12; height: 15; visible: Battery.isCharging
+                                    ShapePath {
+                                        strokeColor: "#202020"; strokeWidth: 1; fillColor: "#eeeeee"
+                                        PathSvg { path: "M 7 0 L 1 8 H 5 L 4 15 L 11 6 H 7 Z" }
+                                    }
                                 }
                             }
                             Rectangle {
@@ -190,6 +229,14 @@ Scope {
                                 anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
                             }
                         }
+                    }
+                        MouseArea {
+                            id: batteryMouse
+                            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onClicked: notchRoot.batteryScreen = window.modelData
+                        }
+                        Controls.ToolTip.visible: batteryMouse.containsMouse
+                        Controls.ToolTip.text: "Batería y modo de energía"
                     }
                 }
             }

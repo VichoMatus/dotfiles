@@ -170,24 +170,21 @@ Scope {
                     Item {
                         Layout.preferredWidth: 28; Layout.preferredHeight: 30
                         Item {
-                            anchors.centerIn: parent; width: 24; height: 20
+                            anchors.centerIn: parent; width: 24; height: 18
                             opacity: Network.wifiEnabled || Network.ethernet ? 1 : 0.45
                             Shape {
                                 anchors.fill: parent
+                                preferredRendererType: Shape.CurveRenderer
                                 ShapePath {
-                                    strokeWidth: 2.8; strokeColor: "#eeeeee"; fillColor: "transparent"; capStyle: ShapePath.RoundCap
-                                    PathSvg { path: "M 2 6 Q 12 -1 22 6" }
+                                    strokeWidth: 2.6; strokeColor: "#eeeeee"; fillColor: "transparent"; capStyle: ShapePath.RoundCap
+                                    PathSvg { path: "M 2 5.5 Q 12 -2 22 5.5" }
                                 }
                                 ShapePath {
-                                    strokeWidth: 2.8; strokeColor: "#eeeeee"; fillColor: "transparent"; capStyle: ShapePath.RoundCap
-                                    PathSvg { path: "M 5.5 10 Q 12 5.5 18.5 10" }
-                                }
-                                ShapePath {
-                                    strokeWidth: 2.8; strokeColor: "#eeeeee"; fillColor: "transparent"; capStyle: ShapePath.RoundCap
-                                    PathSvg { path: "M 9 14 Q 12 12 15 14" }
+                                    strokeWidth: 2.6; strokeColor: "#eeeeee"; fillColor: "transparent"; capStyle: ShapePath.RoundCap
+                                    PathSvg { path: "M 6 10 Q 12 5.5 18 10" }
                                 }
                             }
-                            Rectangle { width: 3; height: 3; radius: 1.5; x: 10.5; y: 17; color: "#eeeeee" }
+                            Rectangle { width: 3.5; height: 3.5; radius: 1.75; x: 10.25; y: 13; color: "#eeeeee"; antialiasing: true }
                         }
                         MouseArea {
                             id: wifiMouse

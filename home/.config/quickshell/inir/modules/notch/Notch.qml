@@ -38,7 +38,8 @@ Scope {
             WlrLayershell.layer: WlrLayer.Top
             exclusionMode: ExclusionMode.Normal
             exclusiveZone: visible ? 42 : 0
-            implicitHeight: face.height + 2
+            // Keep the Wayland surface stable; animate only the notch inside it.
+            implicitHeight: Math.min(304, window.modelData.height)
             visible: GlobalStates.barOpen && !GlobalStates.screenLocked
                 && !GameMode.hasFullscreenOnOutput(window.modelData.name)
             mask: Region {
@@ -288,6 +289,9 @@ Scope {
                 }
                 Behavior on width { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
                 Behavior on height { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
+                Item {
+                anchors.fill: parent
+                clip: true
                 HoverHandler { id: hover; onHoveredChanged: if (hovered) window.wake() }
                 Item {
                     id: compact
@@ -560,6 +564,7 @@ Scope {
                         Layout.fillWidth: true; visible: text.length > 0
                         text: window.levelMessage; color: "#cccccc"; wrapMode: Text.Wrap; font.pixelSize: 12
                     }
+                }
                 }
             }
         }

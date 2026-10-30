@@ -42,7 +42,10 @@ Scope {
             visible: GlobalStates.barOpen && !GlobalStates.screenLocked
                 && !GameMode.hasFullscreenOnOutput(window.modelData.name)
             mask: Region {
-                item: face
+                x: face.x - 14
+                y: 0
+                width: face.width + 28
+                height: face.height
                 Region { item: statusArea }
             }
             property bool expanded: false
@@ -94,7 +97,8 @@ Scope {
                 function status(): string {
                     return JSON.stringify({visible: window.visible, expanded: window.expanded,
                         notification: window.notice !== null, dimmed: window.dimmed, shift: window.shift,
-                        playing: window.playing, level: window.levelKind})
+                        playing: window.playing, level: window.levelKind,
+                        batteryMenu: notchRoot.batteryScreen !== null})
                 }
             }
             Timer {
@@ -190,8 +194,6 @@ Scope {
                             anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                             onClicked: GlobalStates.openSidebarRight(window.modelData.name)
                         }
-                        Controls.ToolTip.visible: wifiMouse.containsMouse
-                        Controls.ToolTip.text: Network.connectionTooltip()
                     }
                     Item {
                         visible: Battery.available
@@ -233,10 +235,10 @@ Scope {
                         MouseArea {
                             id: batteryMouse
                             anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                            onClicked: notchRoot.batteryScreen = window.modelData
+                            onClicked: {
+                                Qt.callLater(() => { notchRoot.batteryScreen = window.modelData })
+                            }
                         }
-                        Controls.ToolTip.visible: batteryMouse.containsMouse
-                        Controls.ToolTip.text: "Batería y modo de energía"
                     }
                 }
             }
@@ -251,6 +253,20 @@ Scope {
                 radius: 22
                 // A square cap attaches the rounded body to the display edge.
                 Rectangle { width: parent.width; height: 20; color: "black" }
+                Shape {
+                    x: -14; y: 0; width: 14; height: 14
+                    ShapePath {
+                        strokeWidth: 0; fillColor: "black"
+                        PathSvg { path: "M 0 0 H 14 V 14 C 14 6 8 0 0 0 Z" }
+                    }
+                }
+                Shape {
+                    x: parent.width; y: 0; width: 14; height: 14
+                    ShapePath {
+                        strokeWidth: 0; fillColor: "black"
+                        PathSvg { path: "M 0 0 H 14 C 6 0 0 6 0 14 Z" }
+                    }
+                }
                 Behavior on width { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
                 Behavior on height { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
                 HoverHandler { id: hover; onHoveredChanged: if (hovered) window.wake() }

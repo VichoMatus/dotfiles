@@ -33,7 +33,7 @@ PanelWindow {
         const minutes = Math.floor(seconds / 60)
         return Math.floor(minutes / 60) + " h " + String(minutes % 60).padStart(2, "0") + " min"
     }
-    MouseArea { anchors.fill: parent; onClicked: menu.dismissed() }
+    MouseArea { anchors.fill: parent; onPressed: menu.dismissed() }
     Rectangle {
         id: card
         anchors.right: parent.right; anchors.rightMargin: 12

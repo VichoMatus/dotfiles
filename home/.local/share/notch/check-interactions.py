@@ -24,7 +24,8 @@ for kind in ['volume', 'brightness']:
 if status()['expanded']:
     ipc('notch-eDP-1', 'toggle')
 ipc('notch-eDP-1', 'toggle')
-assert status()['expanded']
-time.sleep(4.3)
+if status()['playing']:
+    assert status()['expanded']
+    time.sleep(4.3)
 assert not status()['expanded']
-print('OK: volumen, brillo, solicitudes repetidas y cierre automático.')
+print('OK: volumen, brillo, solicitudes repetidas y panel musical según reproducción.')

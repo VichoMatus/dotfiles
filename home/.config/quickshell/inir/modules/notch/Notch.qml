@@ -59,10 +59,12 @@ Scope {
             property bool dimmed: false
             property int shift: 0
             property string time: Qt.formatTime(new Date(), "HH:mm")
+            property string dateText: Qt.formatDate(new Date(), "ddd dd/MM")
             readonly property var notice: !GlobalStates.screenLocked && GlobalStates.focusedScreen?.name === window.modelData.name
                 ? (Notifications.popupList[Notifications.popupList.length - 1] ?? null) : null
             readonly property bool open: expanded || notice !== null || levelOpen
             readonly property bool playing: visible && MprisController.isPlaying
+            onPlayingChanged: if (!playing) expanded = false
             property int waveStep: 0
             Timer {
                 interval: 125; running: window.playing; repeat: true
@@ -75,6 +77,10 @@ Scope {
                 dimmed = false; dimTimer.restart()
                 if (expanded) closeTimer.restart()
                 if (levelOpen && !levelSlider.pressed) levelTimer.restart()
+            }
+            function toggleMusic(): void {
+                wake()
+                if (playing) expanded = !expanded
             }
             Timer { id: closeTimer; interval: 4000; onTriggered: window.expanded = false }
             Timer { id: levelTimer; interval: 1800; onTriggered: window.levelKind = "" }
@@ -89,7 +95,7 @@ Scope {
             }
             IpcHandler {
                 target: "notch-" + window.modelData.name
-                function toggle(): void { window.wake(); window.expanded = !window.expanded }
+                function toggle(): void { window.toggleMusic() }
                 function menu(kind: string): void {
                     if (!window.visible) return
                     if (kind === "battery") notchRoot.batteryScreen = notchRoot.batteryScreen ? null : window.modelData
@@ -105,7 +111,10 @@ Scope {
             }
             Timer {
                 interval: 60000; running: window.visible; repeat: true
-                onTriggered: window.time = Qt.formatTime(new Date(), "HH:mm")
+                onTriggered: {
+                    window.time = Qt.formatTime(new Date(), "HH:mm")
+                    window.dateText = Qt.formatDate(new Date(), "ddd dd/MM")
+                }
             }
             Timer {
                 id: dimTimer
@@ -291,7 +300,7 @@ Scope {
                         width: 28; height: 28
                         anchors.left: parent.left; anchors.leftMargin: 20
                         anchors.verticalCenter: parent.verticalCenter
-                        visible: MprisController.activePlayer !== null && !window.expanded
+                        visible: window.playing && !window.expanded
                     }
                     Text {
                         anchors.centerIn: parent
@@ -299,6 +308,7 @@ Scope {
                         font.pixelSize: 16; font.weight: Font.DemiBold
                     }
                     Row {
+                        visible: window.playing
                         anchors.right: parent.right; anchors.rightMargin: 22
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 3
@@ -315,9 +325,23 @@ Scope {
                             }
                         }
                     }
+                    MaterialSymbol {
+                        visible: !window.playing
+                        anchors.left: parent.left; anchors.leftMargin: 22
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "calendar_today"; iconSize: 19; color: "#aebbb3"
+                    }
+                    Text {
+                        visible: !window.playing
+                        anchors.right: parent.right; anchors.rightMargin: 16
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 78; horizontalAlignment: Text.AlignRight
+                        text: window.dateText; color: "#bcbcbc"; font.pixelSize: 11
+                        elide: Text.ElideRight
+                    }
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: { window.wake(); window.expanded = !window.expanded }
+                        onClicked: window.toggleMusic()
                     }
                 }
                 ColumnLayout {
@@ -357,7 +381,7 @@ Scope {
                 }
                 RowLayout {
                     anchors { top: parent.top; topMargin: 58; left: parent.left; right: parent.right; margins: 24 }
-                    visible: window.expanded && !window.notice && !window.levelOpen
+                    visible: window.expanded && window.playing && !window.notice && !window.levelOpen
                     spacing: 20
                     Cover {
                         Layout.preferredWidth: 94; Layout.preferredHeight: 94

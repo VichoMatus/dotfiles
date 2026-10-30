@@ -9,7 +9,7 @@
   "home/.config/niri/config.d/60-animations.kdl": "760a2229a18c978c8e88c32e0a1d635d29027ba88ed84f25b2aa599fa46e56ad",
   "home/.config/niri/config.d/70-binds.kdl": "427056278a432bfc4d4ca2730c320de33d12cbd484c9dc806fcd5421dadd9b3a",
   "home/.config/niri/config.d/80-layer-rules.kdl": "2149e2be959234211e73e1c87f4b4cfdcb30c8af7f0fc2d60cf15a5671745b0f",
-  "home/.config/niri/config.d/90-user-extra.kdl": "76bce51f15061213ad4d9de611a5419c9d882d4498b0adf32b2318bc9fbf6d29",
+  "home/.config/niri/config.d/90-user-extra.kdl": "17e15e44960513b89c5afda0c726976a08630965d17683715f9cf23c139ea461",
   "home/.config/niri/config.kdl": "de2f0dc1a09406ec296cb033e3fd8bb8a93d9bbad4c2cb1477239a6a6c36c8e8",
   "home/.config/quickshell/inir/GlobalStates.qml": "a182f9c94c24e888793f1bb6b0892b87f7abd3131c8d8cacc346052578f675e1",
   "home/.config/quickshell/inir/modules/ii/ShellIiPanelsImpl.qml": "022e71540d1683c4ed16473967a0bae2ca9c8daee9641694f583b5c22ebf8c90",

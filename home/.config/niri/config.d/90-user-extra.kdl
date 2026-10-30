@@ -100,3 +100,8 @@ window-rule {
     exclude app-id=r#"^xembedsniproxy$"#
     opacity 1.0
 }
+
+// Smaller gaps keep windows distinct while using more of the screen.
+layout {
+    gaps 10
+}

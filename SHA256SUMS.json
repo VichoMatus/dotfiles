@@ -14,7 +14,7 @@
   "home/.config/quickshell/inir/GlobalStates.qml": "a182f9c94c24e888793f1bb6b0892b87f7abd3131c8d8cacc346052578f675e1",
   "home/.config/quickshell/inir/modules/ii/ShellIiPanelsImpl.qml": "022e71540d1683c4ed16473967a0bae2ca9c8daee9641694f583b5c22ebf8c90",
   "home/.config/quickshell/inir/modules/ii/critical/ShellIiCriticalPanels.qml": "538accb52f901689889ae356321ccfeea497efbf4421cb89e8e474f3d671fe47",
-  "home/.config/quickshell/inir/modules/notch/Notch.qml": "1dec10ede427c1b873d21314e95e05183046a0f2bedb7aab748b3133e702bcb3",
+  "home/.config/quickshell/inir/modules/notch/Notch.qml": "f18567a7824c9ca550b5127b9a5e90fcbfeba05b431b214674560b47f8b4527f",
   "home/.config/quickshell/inir/modules/onScreenDisplay/OnScreenDisplay.qml": "5b87680166ab2a1616342b4baddb8547ffc1a10900cf2f51aab8686976ab831e",
   "home/.config/systemd/user/power-profile-auto.service": "3322eb4e25bf86ee71a5d24a442cde3ba1d9a4cd11e8b82f07e59c7e3ff43e12",
   "home/.local/bin/modo-tele": "3d12b8a27a79c6d8fb7368a6c2fc201a82ee066b37c94c5fc58c7a0a510db0e1",

@@ -303,6 +303,7 @@ Scope {
                         visible: window.playing && !window.expanded
                     }
                     Text {
+                        visible: window.playing
                         anchors.centerIn: parent
                         text: window.time; color: "#d5d5d5"
                         font.pixelSize: 16; font.weight: Font.DemiBold
@@ -325,19 +326,19 @@ Scope {
                             }
                         }
                     }
-                    MaterialSymbol {
+                    Row {
                         visible: !window.playing
-                        anchors.left: parent.left; anchors.leftMargin: 22
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "calendar_today"; iconSize: 19; color: "#aebbb3"
-                    }
+                        anchors.centerIn: parent
+                        spacing: 24
                     Text {
-                        visible: !window.playing
-                        anchors.right: parent.right; anchors.rightMargin: 16
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 78; horizontalAlignment: Text.AlignRight
-                        text: window.dateText; color: "#bcbcbc"; font.pixelSize: 11
-                        elide: Text.ElideRight
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: window.time; color: "#d5d5d5"
+                            font.pixelSize: 16; font.weight: Font.DemiBold
+                        }
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: window.dateText; color: "#bcbcbc"; font.pixelSize: 13
+                        }
                     }
                     MouseArea {
                         anchors.fill: parent

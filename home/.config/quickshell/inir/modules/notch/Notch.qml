@@ -264,7 +264,7 @@ Scope {
             Rectangle {
                 id: face
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: Math.min(window.width - 20, window.open ? 420 : 252)
+                width: Math.min(window.width - 20, window.open ? 420 : window.playing ? 252 : 176)
                 height: window.levelOpen ? (window.levelMessage.length > 0 ? 154 : 122)
                     : window.notice ? Math.min(300, noticeColumn.implicitHeight + 70)
                     : window.expanded ? 208 : 42

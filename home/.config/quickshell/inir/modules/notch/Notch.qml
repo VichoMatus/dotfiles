@@ -11,8 +11,10 @@ import qs
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
+import qs.modules.pill as Pill
 
 Scope {
+    Pill.PillTrayMenu { id: trayMenu }
     Variants {
         model: Quickshell.screens
         PanelWindow {
@@ -28,7 +30,10 @@ Scope {
             implicitHeight: face.height + 2
             visible: GlobalStates.barOpen && !GlobalStates.screenLocked
                 && !GameMode.hasFullscreenOnOutput(window.modelData.name)
-            mask: Region { item: face }
+            mask: Region {
+                item: face
+                Region { item: statusArea }
+            }
             property bool expanded: false
             property string levelKind: ""
             property string levelMessage: ""
@@ -48,7 +53,7 @@ Scope {
                 interval: 125; running: window.playing; repeat: true
                 onTriggered: window.waveStep = (window.waveStep + 1) % 16
             }
-            onVisibleChanged: if (!visible) { expanded = false; levelKind = ""; levelTimer.stop() }
+            onVisibleChanged: if (!visible) { expanded = false; levelKind = ""; levelTimer.stop(); if (trayMenu.hostWindow === window) trayMenu.close() }
             onExpandedChanged: if (expanded) closeTimer.restart(); else closeTimer.stop()
             onNoticeChanged: { dimmed = false; dimTimer.restart() }
             function wake() {
@@ -114,6 +119,78 @@ Scope {
                 Text {
                     anchors.centerIn: parent; text: "♪"; color: "#cccccc"
                     visible: art.status !== Image.Ready
+                }
+            }
+            Item {
+                id: statusArea
+                anchors.right: parent.right
+                anchors.rightMargin: 16
+                width: Math.min(statusRow.implicitWidth, Math.max(0, window.width / 2 - face.width / 2 - 32))
+                height: 42
+                clip: true
+                opacity: window.dimmed && !statusHover.hovered ? 0.65 : 1
+                HoverHandler { id: statusHover; onHoveredChanged: if (hovered) window.wake() }
+                RowLayout {
+                    id: statusRow
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: [0, 1, 2, 1][window.shift]
+                    spacing: 14
+                    Pill.Tray {
+                        id: backgroundApps
+                        barWindow: window
+                        Layout.preferredWidth: implicitWidth
+                        Layout.preferredHeight: 30
+                        menuOpen: trayMenu.shown && trayMenu.hostWindow === window
+                        onMenuRequested: (item, anchorX, anchorY) => {
+                            trayMenu.hostWindow = window
+                            trayMenu.open(item, anchorX, anchorY)
+                        }
+                    }
+                    Item {
+                        Layout.preferredWidth: 28; Layout.preferredHeight: 30
+                        MaterialSymbol {
+                            anchors.centerIn: parent; iconSize: 21; fill: 1
+                            text: Network.ethernet ? "lan" : Network.wifiEnabled ? "wifi" : "wifi_off"
+                            color: Network.wifiStatus === "connected" || Network.ethernet ? "#eeeeee" : "#999999"
+                        }
+                        MouseArea {
+                            id: wifiMouse
+                            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onClicked: AppLauncher.launchNetworkSettings(Network.ethernet)
+                        }
+                        Controls.ToolTip.visible: wifiMouse.containsMouse
+                        Controls.ToolTip.text: Network.connectionTooltip()
+                    }
+                    RowLayout {
+                        visible: Battery.available
+                        spacing: 7
+                        Text {
+                            text: Math.round(Battery.percentage * 100) + "%"
+                            color: "#eeeeee"; font.pixelSize: 12
+                        }
+                        Item {
+                            Layout.preferredWidth: 29; Layout.preferredHeight: 16
+                            Rectangle {
+                                width: 25; height: 13; radius: 3
+                                anchors.verticalCenter: parent.verticalCenter
+                                color: "transparent"; border.width: 1; border.color: "#bbbbbb"
+                                Rectangle {
+                                    x: 3; y: 3; height: parent.height - 6; radius: 1
+                                    width: Math.max(0, (parent.width - 6) * Math.max(0, Math.min(1, Battery.percentage)))
+                                    color: Battery.isLowAndNotCharging ? "#ee7777" : "#eeeeee"
+                                }
+                                MaterialSymbol {
+                                    anchors.centerIn: parent; iconSize: 12; fill: 1
+                                    text: "bolt"; visible: Battery.isCharging; color: "#73bb91"
+                                }
+                            }
+                            Rectangle {
+                                width: 2; height: 5; radius: 1; color: "#bbbbbb"
+                                anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+                    }
                 }
             }
             Rectangle {

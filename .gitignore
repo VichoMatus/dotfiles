@@ -1,0 +1,9 @@
+*.tar.gz
+*.bak
+__pycache__/
+*.pyc
+.env
+.env.*
+restore.json
+last-restore.json
+configuracion-completa*

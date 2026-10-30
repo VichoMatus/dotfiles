@@ -1,0 +1,102 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 90 — Your personal overrides
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// This file is YOURS. iNiR updates will never overwrite it.
+// Put any custom configuration here: extra binds, per-app window rules,
+// output configuration, named workspaces, etc.
+//
+// Since Niri evaluates config top-to-bottom, settings here take effect
+// after all other config.d files. For window-rule properties, all matching
+// rules accumulate. For scalar values (like gaps), the last one wins.
+//
+// Examples:
+//
+//   // Named workspaces (sticky, always present)
+//   workspace "browser"
+//   workspace "code"
+//   workspace "music"
+//
+//   // Per-app workspace assignment
+//   window-rule {
+//       match app-id="firefox"
+//       open-on-workspace "browser"
+//   }
+//
+//   // Extra keybind
+//   binds {
+//       Mod+P { spawn "rofi" "-show" "drun"; }
+//   }
+//
+//   // Output config for your specific monitor
+//   output "DP-1" {
+//       mode "3440x1440@100.000"
+//       scale 1
+//       position x=0 y=0
+//   }
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Atajos optimizados para distribución de teclado "latam" (ISO)
+// ═══════════════════════════════════════════════════════════════════════════════
+// En teclados latinoamericanos, símbolos como corchetes ([ ]), signo igual (=)
+// y menos (-) requieren combinaciones complejas con AltGr o Shift, o cambian
+// de posición física respecto al estándar US.
+//
+// Este bloque reasigna los atajos de gestión de ventanas utilizando teclas seguras
+// y universales (flechas direccionales, teclas Vim HJKL y letras alfanuméricas).
+// ─────────────────────────────────────────────────────────────────────────────
+
+binds {
+
+    // ── Redimensionar ventanas y columnas (±10%) ──────────────────────────────
+    // Reemplaza a Mod+Minus / Mod+Equal y Mod+Shift+Minus / Mod+Shift+Equal.
+
+    // Opción A: Flechas direccionales con Mod + Alt
+    // Redimensionar ancho: Mod + Alt + Izquierda / Derecha
+    Mod+Alt+Left  { set-column-width "-10%"; }
+    Mod+Alt+Right { set-column-width "+10%"; }
+    // Redimensionar alto: Mod + Alt + Abajo / Arriba
+    Mod+Alt+Down  { set-window-height "-10%"; }
+    Mod+Alt+Up    { set-window-height "+10%"; }
+
+    // Opción B: Teclas estilo Vim (H J K L) con Mod + Ctrl
+    // (Se usa Ctrl en lugar de Alt para no colisionar con Mod+Alt+L que bloquea pantalla)
+    // Redimensionar ancho: Mod + Ctrl + H / L
+    Mod+Ctrl+H { set-column-width "-10%"; }
+    Mod+Ctrl+L { set-column-width "+10%"; }
+    // Redimensionar alto: Mod + Ctrl + J / K
+    Mod+Ctrl+J { set-window-height "-10%"; }
+    Mod+Ctrl+K { set-window-height "+10%"; }
+
+    // ── Consumir / Expulsar ventanas en columnas (Consume or Expel) ───────────
+    // Reemplaza a Mod+BracketLeft ([) y Mod+BracketRight (]), que en latam requieren AltGr.
+    // Usamos Mod + U (izquierda) y Mod + I (derecha), adyacentes y directas sin modificadores extra.
+    // Consumir o expulsar ventana hacia la izquierda: Mod + U
+    Mod+U { consume-or-expel-window-left; }
+    // Consumir o expulsar ventana hacia la derecha: Mod + I
+    Mod+I { consume-or-expel-window-right; }
+
+    // ── Extra recomendado para latam: Atajo alternativo para Cheatsheet ──────
+    // En latam, '/' requiere Shift+7 (Mod+Shift+7). Se añade Mod+F1 como alternativa universal.
+    // Mostrar cheatsheet / ayuda: Mod + F1
+    Mod+F1 { spawn "inir" "cheatsheet" "toggle"; }
+
+    // ── Despertar / Alternar barra iNiR con tecla física Copilot ──────────────
+    // La tecla Copilot emite XF86Assistant (o Super+Shift+XF86Assistant / Super+Shift+F23).
+    XF86Assistant           { spawn "inir" "bar" "toggle"; }
+    Mod+Shift+XF86Assistant { spawn "inir" "bar" "toggle"; }
+    Mod+Shift+F23           { spawn "inir" "bar" "toggle"; }
+
+    // ── Cambiar música con Fn + Flecha Izquierda / Derecha (Home / End) ───────
+    // En el ASUS Zenbook 14, el firmware traduce Fn+Left a Home y Fn+Right a End.
+    Home { spawn "inir" "mpris" "previous"; }
+    End  { spawn "inir" "mpris" "next"; }
+}
+
+// Keep normal inactive windows opaque; preserve the invisible tray bridge.
+window-rule {
+    match is-active=false
+    exclude app-id=r#"^xembedsniproxy$"#
+    opacity 1.0
+}

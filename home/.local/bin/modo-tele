@@ -1,0 +1,143 @@
+#!/usr/bin/python
+"""Temporarily reduce desktop work while watching video."""
+import fcntl
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+HOME = Path.home()
+STATE = HOME / '.local/state/modo-tele'
+CONFIG = HOME / '.config/inir/config.json'
+ANIMATIONS = HOME / '.config/niri/config.d/60-animations.kdl'
+SNAPSHOT = STATE / 'restore.json'
+
+
+def run(*args, check=True):
+    return subprocess.run(args, check=check, capture_output=True, text=True, timeout=30)
+
+
+def write(path, text):
+    temporary = path.with_name(path.name + '.tele-tmp')
+    temporary.write_text(text)
+    temporary.replace(path)
+
+
+def value(config, path):
+    for key in path.split('.'):
+        config = config[key]
+    return config
+
+
+def set_value(config, path, new):
+    keys = path.split('.')
+    for key in keys[:-1]:
+        config = config[key]
+    config[keys[-1]] = new
+
+
+def changes(config):
+    result = {
+        'enabledPanels': [panel for panel in config['enabledPanels'] if panel != 'iiBar'],
+        'performance.lowPower': True,
+        'performance.reduceAnimations': True,
+        'bar.modules.resources': False,
+        'bar.modules.weather': False,
+        'bar.weather.enable': False,
+        'resources.monitorGpu': False,
+        'resources.updateInterval': 60000,
+        'background.enableAnimation': False,
+        'background.effects.enableBlur': False,
+        'background.backdrop.enableAnimation': False,
+        'background.backdrop.blurRadius': 0,
+        'shellUpdates.enabled': False,
+        'calendar.externalSync.enable': False,
+    }
+    # Keep the display awake for video; before-sleep locking remains enabled.
+    for prefix in ['idle', 'idle.onBattery']:
+        for key in ['screenOffTimeout', 'lockTimeout', 'suspendTimeout']:
+            result[f'{prefix}.{key}'] = 0
+    for name, widget in config['background']['widgets'].items():
+        if isinstance(widget, dict) and 'enable' in widget and name != 'powerSaving':
+            result[f'background.widgets.{name}.enable'] = False
+    return result
+
+
+def activate():
+    if SNAPSHOT.exists():
+        return
+    config = json.loads(CONFIG.read_text())
+    updates = changes(config)
+    saved = {
+        'values': {key: value(config, key) for key in updates},
+        'animations': ANIMATIONS.read_text(),
+        'services': [],
+    }
+    for unit in ['localsearch-3.service', 'app-blueman@autostart.service']:
+        if run('systemctl', '--user', 'is-active', '--quiet', unit, check=False).returncode == 0:
+            saved['services'].append(unit)
+    # Persist recovery before any mutation, including partial activation failures.
+    write(SNAPSHOT, json.dumps(saved, indent=2))
+    for key, new in updates.items():
+        set_value(config, key, new)
+    write(CONFIG, json.dumps(config, ensure_ascii=False, indent=4) + '\n')
+    if 'animations {' not in saved['animations']:
+        raise RuntimeError('No se encontró el bloque de animaciones; ejecuta modo-tele off')
+    write(ANIMATIONS, saved['animations'].replace('animations {', 'animations {\n    off // Modo Tele', 1))
+    run('niri', 'validate')
+    for unit in saved['services']:
+        run('systemctl', '--user', 'stop', unit)
+    run('systemctl', '--user', 'restart', 'power-profile-auto.service')
+    run('powerprofilesctl', 'set', 'power-saver')
+    run('systemctl', '--user', 'restart', 'inir.service')
+
+
+def deactivate():
+    if not SNAPSHOT.exists():
+        return
+    saved = json.loads(SNAPSHOT.read_text())
+    config = json.loads(CONFIG.read_text())
+    for key, previous in saved['values'].items():
+        set_value(config, key, previous)
+    write(CONFIG, json.dumps(config, ensure_ascii=False, indent=4) + '\n')
+    write(ANIMATIONS, saved['animations'])
+    run('niri', 'validate')
+    for unit in saved['services']:
+        run('systemctl', '--user', 'start', unit)
+    run('systemctl', '--user', 'restart', 'inir.service')
+    # Profile automation uses this file to recognize Tele, including after reboot.
+    SNAPSHOT.rename(STATE / 'last-restore.json')
+    try:
+        run('systemctl', '--user', 'restart', 'power-profile-auto.service')
+    except Exception:
+        (STATE / 'last-restore.json').rename(SNAPSHOT)
+        raise
+
+
+def main():
+    STATE.mkdir(parents=True, exist_ok=True, mode=0o700)
+    os.chmod(STATE, 0o700)
+    with (STATE / 'lock').open('w') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        action = sys.argv[1] if len(sys.argv) > 1 else 'toggle'
+        if action == 'status':
+            print('Tele activo' if SNAPSHOT.exists() else 'Modo normal')
+            return
+        if action == 'toggle':
+            action = 'off' if SNAPSHOT.exists() else 'on'
+        if action not in ['on', 'off']:
+            raise ValueError('Uso: modo-tele [on|off|toggle|status]')
+        (activate if action == 'on' else deactivate)()
+        message = 'Tele activo: ahorro y pantalla despierta' if SNAPSHOT.exists() else 'Modo normal restaurado'
+        print(message)
+        run('notify-send', 'Modo Tele', message, check=False)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as error:
+        print(f'Modo Tele: {error}. Para restaurar: modo-tele off', file=sys.stderr)
+        subprocess.run(['notify-send', 'Modo Tele: error', str(error)], check=False)
+        sys.exit(1)

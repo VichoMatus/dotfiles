@@ -1,0 +1,14 @@
+[Unit]
+Description=Performance on AC, balanced on battery
+After=graphical-session.target
+PartOf=graphical-session.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+ExecStart=%h/.local/bin/power-profile-auto
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target

@@ -1,0 +1,235 @@
+{
+  "panelFamily": "ii",
+  "enabledPanels": [
+    "iiBar",
+    "iiBackground",
+    "iiBackdrop",
+    "iiCheatsheet",
+    "iiControlPanel",
+    "iiDock",
+    "iiLock",
+    "iiMediaControls",
+    "iiNotificationPopup",
+    "iiOnScreenDisplay",
+    "iiOnScreenKeyboard",
+    "iiOverlay",
+    "iiOverview",
+    "iiPolkit",
+    "iiRegionSelector",
+    "iiScreenCorners",
+    "iiSessionScreen",
+    "iiSidebarLeft",
+    "iiSidebarRight",
+    "iiTilingOverlay",
+    "iiVerticalBar",
+    "iiWallpaperSelector",
+    "iiWallpaperLauncher",
+    "iiCoverflowSelector",
+    "iiClipboard",
+    "iiShellUpdate",
+    "iiDashboard",
+    "iiMascotCompanion",
+    "wBar",
+    "wBackground",
+    "wBackdrop",
+    "wStartMenu",
+    "wActionCenter",
+    "wNotificationCenter",
+    "wNotificationPopup",
+    "wOnScreenDisplay",
+    "wWidgets",
+    "wTaskView",
+    "wLock",
+    "wPolkit",
+    "wSessionScreen",
+    "iiBootGreeting",
+    "iiRecordingOsd",
+    "irisBar",
+    "irisBackground",
+    "irisPalette",
+    "irisControlCenter",
+    "irisNotificationPopup",
+    "irisOnScreenDisplay",
+    "irisSessionScreen",
+    "irisLock",
+    "irisPolkit"
+  ],
+  "performance": {
+    "blurAreas": {
+      "bar": "inherit",
+      "dock": "inherit",
+      "islands": "inherit",
+      "panels": "inherit",
+      "widgets": "inherit"
+    },
+    "blurBackend": "auto",
+    "compositorBlur": false,
+    "jsgcThreshold": 300,
+    "lowPower": true,
+    "memoryMonitoring": true,
+    "memoryWarningNotification": false,
+    "reduceAnimations": true
+  },
+  "resources": {
+    "monitorGpu": false,
+    "updateInterval": 10000
+  },
+  "idle": {
+    "lockBeforeSleep": true,
+    "lockTimeout": 600,
+    "onBattery": {
+      "enable": true,
+      "lockTimeout": 300,
+      "screenOffTimeout": 120,
+      "suspendTimeout": 600
+    },
+    "screenOffTimeout": 300,
+    "suspendTimeout": 0
+  },
+  "powerProfiles": {
+    "preferredProfile": "balanced",
+    "restoreOnStart": false
+  },
+  "battery": {
+    "chargeLimit": {
+      "enable": true,
+      "threshold": 80
+    }
+  },
+  "bar": {
+    "appearanceStyle": "classic",
+    "vertical": false,
+    "resources": {
+      "alwaysShowCpu": true,
+      "alwaysShowGpu": false,
+      "alwaysShowSwap": false,
+      "alwaysShowTemp": true,
+      "cpuWarningThreshold": 90,
+      "gpuWarningThreshold": 90,
+      "memoryWarningThreshold": 95,
+      "showCpuIndicator": true,
+      "showGpuIndicator": false,
+      "showMemoryIndicator": true,
+      "showSwapIndicator": false,
+      "showTempIndicator": true,
+      "swapWarningThreshold": 85,
+      "tempCautionThreshold": 65,
+      "tempWarningThreshold": 80
+    },
+    "modules": {
+      "activeWindow": true,
+      "battery": true,
+      "clock": true,
+      "leftSidebarButton": true,
+      "media": true,
+      "resources": true,
+      "rightSidebarButton": true,
+      "sysTray": true,
+      "taskbar": false,
+      "utilButtons": true,
+      "weather": true,
+      "workspaces": true
+    },
+    "weather": {
+      "enable": true
+    }
+  },
+  "osd": {
+    "mediaEnabled": false
+  },
+  "background": {
+    "effects": {
+      "enableBlur": false
+    },
+    "backdrop": {
+      "blurRadius": 0,
+      "enableAnimation": false
+    },
+    "enableAnimation": true,
+    "pauseAnimationOnBattery": true,
+    "widgets": {
+      "powerSaving": {
+        "enable": true,
+        "pauseOnFullscreen": true,
+        "pauseOnGameMode": true,
+        "pauseWhenWindowsPresent": true,
+        "showPausedEffect": false
+      },
+      "battery": {
+        "enable": false
+      },
+      "calendarUpcoming": {
+        "enable": false
+      },
+      "clock": {
+        "enable": true
+      },
+      "controls": {
+        "enable": false
+      },
+      "customImage": {
+        "enable": false
+      },
+      "dateBadge": {
+        "enable": false
+      },
+      "dayProgress": {
+        "enable": false
+      },
+      "editorial": {
+        "enable": false
+      },
+      "imageConverter": {
+        "enable": false
+      },
+      "japaneseTypography": {
+        "enable": true
+      },
+      "mascot": {
+        "enable": false
+      },
+      "mediaControls": {
+        "enable": false
+      },
+      "monthCalendar": {
+        "enable": false
+      },
+      "newsTicker": {
+        "enable": false
+      },
+      "notes": {
+        "enable": false
+      },
+      "screenTime": {
+        "enable": false
+      },
+      "shape": {
+        "enable": false
+      },
+      "systemMonitor": {
+        "enable": false
+      },
+      "timers": {
+        "enable": false
+      },
+      "todo": {
+        "enable": false
+      },
+      "uptime": {
+        "enable": false
+      },
+      "userCard": {
+        "enable": false
+      },
+      "visualizer": {
+        "enable": false
+      },
+      "weather": {
+        "enable": false
+      },
+      "worldClock": {
+        "enable": false
+      }
+    }
+  }
+}

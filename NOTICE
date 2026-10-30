@@ -1,0 +1,4 @@
+Configuración personal basada en snowarch/iNiR (GPL-3.0).
+https://github.com/snowarch/iNiR
+Los archivos QML de integración incluyen código de iNiR y conservan su licencia GPL-3.0.
+Base instalada: iNiR 2.33.0, commit 48cdcecb.

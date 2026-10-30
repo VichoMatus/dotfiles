@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Modo Tele — activar o desactivar
+Comment=Ahorro para ver video; vuelve a ejecutar para restaurar
+Exec=modo-tele toggle
+Icon=video-display
+Terminal=false
+Categories=AudioVideo;Settings;

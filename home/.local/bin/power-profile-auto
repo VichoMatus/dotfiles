@@ -1,0 +1,55 @@
+#!/usr/bin/python
+"""Select a power profile at login and when UPower changes power source."""
+import logging
+import subprocess
+from pathlib import Path
+from gi.repository import Gio, GLib
+
+
+def desired_profile(on_battery):
+    if (Path.home() / '.local/state/modo-tele/restore.json').exists():
+        return 'power-saver'
+    return "balanced" if on_battery else "performance"
+
+
+def main():
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    proxy = Gio.DBusProxy.new_for_bus_sync(
+        Gio.BusType.SYSTEM, Gio.DBusProxyFlags.NONE, None,
+        "org.freedesktop.UPower", "/org/freedesktop/UPower",
+        "org.freedesktop.UPower", None,
+    )
+    previous = None
+
+    def apply():
+        nonlocal previous
+        value = proxy.get_cached_property("OnBattery")
+        if value is None:
+            logging.warning("UPower OnBattery unavailable; keeping current profile")
+            return
+        on_battery = value.unpack()
+        if on_battery == previous:
+            return
+        profile = desired_profile(on_battery)
+        result = subprocess.run(
+            ["/usr/bin/powerprofilesctl", "set", profile],
+            capture_output=True, text=True, timeout=15,
+        )
+        if result.returncode:
+            raise RuntimeError(result.stderr.strip())
+        previous = on_battery
+        logging.info("Power source changed: selected %s", profile)
+
+    def changed(*_args):
+        try:
+            apply()
+        except Exception:
+            logging.exception("Could not apply power profile")
+
+    proxy.connect("g-properties-changed", changed)
+    apply()
+    GLib.MainLoop().run()
+
+
+if __name__ == "__main__":
+    main()

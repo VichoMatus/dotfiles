@@ -18,6 +18,32 @@ import qs.modules.notch
 Scope {
     id: notchRoot
     property var batteryScreen: null
+    property bool visualBreak: false
+    function beginRest(milliseconds: int): bool {
+        if (visualBreak || !GlobalStates.barOpen || GlobalStates.screenLocked
+                || !Quickshell.screens.some(screen => !GameMode.hasFullscreenOnOutput(screen.name))) return false
+        batteryScreen = null
+        trayMenu.close()
+        visualBreak = true
+        restTimer.interval = milliseconds
+        restTimer.restart()
+        return true
+    }
+    Timer {
+        interval: 600000; repeat: true; running: true
+        onTriggered: notchRoot.beginRest(30000)
+    }
+    Timer { id: restTimer; onTriggered: notchRoot.visualBreak = false }
+    IpcHandler {
+        target: "notch-rest"
+        function status(): string {
+            return JSON.stringify({active: notchRoot.visualBreak, everySeconds: 600, durationSeconds: 30})
+        }
+        function start(seconds: int): bool {
+            if (seconds < 1 || seconds > 60) return false
+            return notchRoot.beginRest(seconds * 1000)
+        }
+    }
     LazyLoader {
         active: notchRoot.batteryScreen !== null
         component: BatteryMenu {
@@ -42,7 +68,11 @@ Scope {
             implicitHeight: Math.min(304, window.modelData.height)
             visible: GlobalStates.barOpen && !GlobalStates.screenLocked
                 && !GameMode.hasFullscreenOnOutput(window.modelData.name)
-            mask: Region {
+            // Keep the reserved space while blanking the bar; no window reflow.
+            mask: notchRoot.visualBreak ? emptyRegion : barRegion
+            Region { id: emptyRegion; width: 0; height: 0 }
+            Region {
+                id: barRegion
                 x: face.x - 14
                 y: 0
                 width: face.width + 28
@@ -64,7 +94,7 @@ Scope {
             readonly property var notice: !GlobalStates.screenLocked && GlobalStates.focusedScreen?.name === window.modelData.name
                 ? (Notifications.popupList[Notifications.popupList.length - 1] ?? null) : null
             readonly property bool open: expanded || notice !== null || levelOpen
-            readonly property bool playing: visible && MprisController.isPlaying
+            readonly property bool playing: visible && !notchRoot.visualBreak && MprisController.isPlaying
             onPlayingChanged: if (!playing) expanded = false
             property int waveStep: 0
             Timer {
@@ -86,9 +116,22 @@ Scope {
             Timer { id: closeTimer; interval: 4000; onTriggered: window.expanded = false }
             Timer { id: levelTimer; interval: 1800; onTriggered: window.levelKind = "" }
             Connections {
+                target: notchRoot
+                function onVisualBreakChanged(): void {
+                    if (notchRoot.visualBreak) {
+                        window.expanded = false
+                        window.levelKind = ""
+                        levelTimer.stop()
+                    } else {
+                        window.time = Qt.formatTime(new Date(), "HH:mm")
+                        window.dateText = Qt.formatDate(new Date(), "ddd dd/MM")
+                    }
+                }
+            }
+            Connections {
                 target: GlobalStates
                 function onNotchLevelRequested(kind: string, message: string): void {
-                    if (!window.visible || GlobalStates.focusedScreen?.name !== window.modelData.name) return
+                    if (!window.visible || notchRoot.visualBreak || GlobalStates.focusedScreen?.name !== window.modelData.name) return
                     window.levelKind = kind
                     window.levelMessage = message
                     window.wake()
@@ -103,7 +146,7 @@ Scope {
                     else if (kind === "wifi") GlobalStates.openSidebarRight(window.modelData.name)
                 }
                 function status(): string {
-                    return JSON.stringify({visible: window.visible, expanded: window.expanded,
+                    return JSON.stringify({visible: window.visible && !notchRoot.visualBreak, expanded: window.expanded,
                         notification: window.notice !== null, dimmed: window.dimmed, shift: window.shift,
                         playing: window.playing, level: window.levelKind,
                         batteryMenu: notchRoot.batteryScreen !== null,
@@ -159,9 +202,9 @@ Scope {
                 y: [0, 1, 2, 1][window.shift]
                 width: Math.min(implicitWidth, Math.max(0, window.width / 2 - face.width / 2 - 38))
                 height: 42
-                active: window.visible
+                active: window.visible && !notchRoot.visualBreak
                 screenName: window.modelData.name
-                opacity: window.dimmed && !leftHover.hovered ? 0.65 : 1
+                opacity: notchRoot.visualBreak ? 0 : window.dimmed && !leftHover.hovered ? 0.65 : 1
                 HoverHandler { id: leftHover; onHoveredChanged: if (hovered) window.wake() }
             }
             Item {
@@ -171,7 +214,7 @@ Scope {
                 width: Math.min(statusRow.implicitWidth, Math.max(0, window.width / 2 - face.width / 2 - 32))
                 height: 42
                 clip: true
-                opacity: window.dimmed && !statusHover.hovered ? 0.65 : 1
+                opacity: notchRoot.visualBreak ? 0 : window.dimmed && !statusHover.hovered ? 0.65 : 1
                 HoverHandler { id: statusHover; onHoveredChanged: if (hovered) window.wake() }
                 RowLayout {
                     id: statusRow
@@ -264,6 +307,7 @@ Scope {
             }
             Rectangle {
                 id: face
+                opacity: notchRoot.visualBreak ? 0 : 1
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: Math.min(window.width - 20, window.open ? 420 : window.playing ? 252 : 176)
                 height: window.levelOpen ? (window.levelMessage.length > 0 ? 154 : 122)

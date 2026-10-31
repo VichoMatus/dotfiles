@@ -31,7 +31,5 @@
   "home/.local/share/notch/check-battery-menu.py": "662eba9ca8d8fee2278d4f83bd806e17c85e09b6e226f2905e5761e62981e193",
   "home/.config/quickshell/inir/modules/notch/LeftStatus.qml": "d2ddeae3602e1ec02ef2e95d22cc3813bb96c2da314596e4c107e6cebb26f5b6",
   "home/.local/share/notch/check-left-status.py": "98c3d3ba7cdec0d689b64cff1c3e4d018223283acb9899ab2a59b40613da612a",
-  "home/.config/wireplumber/wireplumber.conf.d/51-razer-blackshark-volume.conf": "ba3172444f08733e4fab27649afdf3f655553c410b6cf6d9f04d7c86af9b2d7a",
-  "home/.local/share/audio/check-razer-volume.py": "bb8662716886c4f69daf584af2b3b743477540a310accfd9048fce2e72e65a33",
-  "home/.local/share/audio/LEEME.md": "88326ccc6b223f96115b48a4dac2cc93f5a82f3d55cc00dd3f94b9f1e6b9ee7b"
+  "home/.local/share/audio/LEEME.md": "a3b47b6097472756f4f89efe3eb027300fe71d7fec739711c078fc10033f9459"
 }

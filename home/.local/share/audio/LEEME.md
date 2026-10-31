@@ -1,15 +1,9 @@
-# Volumen de Razer BlackShark V2 Pro por USB
+# Audio USB — Razer BlackShark V2 Pro
 
-Regla de usuario: `~/.config/wireplumber/wireplumber.conf.d/51-razer-blackshark-volume.conf`.
+Estado: control de hardware original de PipeWire, sin reglas especiales de WirePlumber para estos audífonos.
 
-Se activa `api.alsa.soft-mixer = true` solo para receptores USB Razer BlackShark V2 Pro 2.4. El volumen y silencio se aplican en software, evitando depender del mezclador de volumen USB. No se desactiva la protección de volumen de iNiR ni se cambia la configuración de los altavoces o de otros modelos.
+Se probó api.alsa.soft-mixer el 31 de octubre de 2026 y se revirtió: el mezclador físico PCM quedó silenciado mientras el control software aparecía activo. El usuario confirmó que el sonido volvió al retirar la regla, reactivar el mezclador físico y restaurar su volumen anterior.
 
-La rueda física del audífono sigue determinando su nivel de hardware. El mezclador software permite atenuar ese nivel; no lo amplifica por encima de la capacidad física del dispositivo.
+No restaurar la antigua regla 51-razer-blackshark-volume.conf ni la prueba check-razer-volume.py. Fueron retiradas del repositorio. La copia de diagnóstico está fuera de los directorios de configuración, en el respaldo local audio-usb-20261031-122614.
 
-Referencia oficial: https://pipewire.pages.freedesktop.org/pipewire/page_man_pipewire-props_7.html (api.alsa.soft-mixer).
-
-La regla requiere reiniciar WirePlumber o la sesión para aplicarse. El reinicio interrumpe brevemente el audio. Comprobar la salida y el nivel antes de reanudar la reproducción.
-
-Prueba: `python ~/.local/share/audio/check-razer-volume.py`. Silencia temporalmente los audífonos, verifica niveles 15–30 % y la orden de subir de iNiR, y restaura volumen/silencio previos. No verifica el volumen percibido: hace falta escuchar una prueba gradual para confirmarlo.
-
-Revertir: retirar la regla anterior y reiniciar `wireplumber.service` de usuario; comprobar de nuevo el volumen. Si el notch mantiene información anterior, reiniciar `inir.service`.
+El comportamiento reportado de poca variación audible por encima del 20 % sigue pendiente de diagnosticar. Una lectura correcta de porcentaje no demuestra un cambio audible. No dar este problema por resuelto ni aplicar otro cambio de mezclador sin comprobar el resultado auditivo.

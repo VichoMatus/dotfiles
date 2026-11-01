@@ -14,7 +14,7 @@
   "home/.config/quickshell/inir/GlobalStates.qml": "a182f9c94c24e888793f1bb6b0892b87f7abd3131c8d8cacc346052578f675e1",
   "home/.config/quickshell/inir/modules/ii/ShellIiPanelsImpl.qml": "022e71540d1683c4ed16473967a0bae2ca9c8daee9641694f583b5c22ebf8c90",
   "home/.config/quickshell/inir/modules/ii/critical/ShellIiCriticalPanels.qml": "538accb52f901689889ae356321ccfeea497efbf4421cb89e8e474f3d671fe47",
-  "home/.config/quickshell/inir/modules/notch/Notch.qml": "7e92b2bcc9dfe5685eecf89cf3c73bdd8a33f189a8b61c9990d825c7f5c2d7b3",
+  "home/.config/quickshell/inir/modules/notch/Notch.qml": "38e786dc29431d01e1bab833e89f1cad98f47949ecc24ed976657f363901a853",
   "home/.config/quickshell/inir/modules/onScreenDisplay/OnScreenDisplay.qml": "5b87680166ab2a1616342b4baddb8547ffc1a10900cf2f51aab8686976ab831e",
   "home/.config/systemd/user/power-profile-auto.service": "3322eb4e25bf86ee71a5d24a442cde3ba1d9a4cd11e8b82f07e59c7e3ff43e12",
   "home/.local/bin/modo-tele": "3d12b8a27a79c6d8fb7368a6c2fc201a82ee066b37c94c5fc58c7a0a510db0e1",
@@ -22,8 +22,8 @@
   "home/.local/share/applications/modo-tele.desktop": "2669822888a1c90cd9cf7d008a1e6c6d43eae8a6540bcb3850c0abee6475786f",
   "home/.local/share/modo-tele/LEEME.md": "1330614d869003b49e97e061bacf5acb6712543df61eb8500d91157f581257e9",
   "home/.local/share/modo-tele/test_modo_tele.py": "456e5ad05a05ad6ae76f84b7e814b342b41eb11daab3d5459c6bbf54875b98f4",
-  "home/.local/share/notch/LEEME.md": "4bae977ead6e94d21d1c114561238e08d26efbf3048571f53293606c47489694",
-  "home/.local/share/notch/check-interactions.py": "1e88f2e416e7da50199b5bb2db29e1a9b946b88777bbdc1295a07bc1b0448ab2",
+  "home/.local/share/notch/LEEME.md": "4ab315769fd9060e91cc614e5ace19e05a8829a0147dc43e274b76c248523fc2",
+  "home/.local/share/notch/check-interactions.py": "96ae7796496286f397c7960d583395ac52369dd4839135a5090ad58f3d9e571d",
   "home/.local/share/notch/measure.py": "e458b68a87bee848245cce6647aa27770177fc34f7bd32a735eecb638663778b",
   "inir-overrides.json": "5057bfda4fc05ffa2cb6afbc5f0f2cbcbabd5bbd71dcc1f2cec5e8c725ef5ead",
   "home/.config/quickshell/inir/modules/notch/BatteryMenu.qml": "6c06bd9a74df9ac96b37aba7314e7ae089c0ade6676aa5733bb0d732ad03a0f0",
@@ -32,5 +32,6 @@
   "home/.config/quickshell/inir/modules/notch/LeftStatus.qml": "d2ddeae3602e1ec02ef2e95d22cc3813bb96c2da314596e4c107e6cebb26f5b6",
   "home/.local/share/notch/check-left-status.py": "98c3d3ba7cdec0d689b64cff1c3e4d018223283acb9899ab2a59b40613da612a",
   "home/.local/share/audio/LEEME.md": "a3b47b6097472756f4f89efe3eb027300fe71d7fec739711c078fc10033f9459",
-  "home/.local/share/notch/check-visual-rest.py": "2f58365ae8d1b49ecccd75359492ddf08c7c864f1d3790cfc4f677e61bc5cd38"
+  "home/.local/share/notch/check-visual-rest.py": "2f58365ae8d1b49ecccd75359492ddf08c7c864f1d3790cfc4f677e61bc5cd38",
+  "home/.local/share/notch/check-media-keep-open.py": "f3aad68d4f7436539397132ce1e428451a006f3be7e80ea2dbf6910a704797d6"
 }

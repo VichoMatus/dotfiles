@@ -27,5 +27,7 @@ ipc('notch-eDP-1', 'toggle')
 if status()['playing']:
     assert status()['expanded']
     time.sleep(4.3)
-assert not status()['expanded']
+    assert status()['expanded'] == status()['hovered']
+else:
+    assert not status()['expanded']
 print('OK: volumen, brillo, solicitudes repetidas y panel musical según reproducción.')

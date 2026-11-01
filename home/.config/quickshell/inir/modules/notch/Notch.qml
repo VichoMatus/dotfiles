@@ -95,26 +95,33 @@ Scope {
                 ? (Notifications.popupList[Notifications.popupList.length - 1] ?? null) : null
             readonly property bool open: expanded || notice !== null || levelOpen
             readonly property bool playing: visible && !notchRoot.visualBreak && MprisController.isPlaying
-            onPlayingChanged: if (!playing) expanded = false
+            readonly property bool mediaMode: playing || (expanded && MprisController.activePlayer !== null)
             property int waveStep: 0
             Timer {
                 interval: 125; running: window.playing; repeat: true
                 onTriggered: window.waveStep = (window.waveStep + 1) % 16
             }
             onVisibleChanged: if (!visible) { expanded = false; levelKind = ""; levelTimer.stop(); if (trayMenu.hostWindow === window) trayMenu.close(); if (notchRoot.batteryScreen === window.modelData) notchRoot.batteryScreen = null }
-            onExpandedChanged: if (expanded) closeTimer.restart(); else closeTimer.stop()
+            onExpandedChanged: if (expanded && !hover.hovered) closeTimer.restart(); else closeTimer.stop()
             onNoticeChanged: { dimmed = false; dimTimer.restart() }
             function wake() {
                 dimmed = false; dimTimer.restart()
-                if (expanded) closeTimer.restart()
+                if (expanded && !hover.hovered) closeTimer.restart()
+                else closeTimer.stop()
                 if (levelOpen && !levelSlider.pressed) levelTimer.restart()
             }
             function toggleMusic(): void {
                 wake()
-                if (playing) expanded = !expanded
+                if (playing || expanded) expanded = !expanded
             }
             Timer { id: closeTimer; interval: 4000; onTriggered: window.expanded = false }
             Timer { id: levelTimer; interval: 1800; onTriggered: window.levelKind = "" }
+            Connections {
+                target: MprisController
+                function onTrackChanged(reverse: bool): void {
+                    if (window.expanded) window.wake()
+                }
+            }
             Connections {
                 target: notchRoot
                 function onVisualBreakChanged(): void {
@@ -150,7 +157,8 @@ Scope {
                         notification: window.notice !== null, dimmed: window.dimmed, shift: window.shift,
                         playing: window.playing, level: window.levelKind,
                         batteryMenu: notchRoot.batteryScreen !== null,
-                        monitoring: leftStatus.acquired, appCount: leftStatus.apps.length})
+                        monitoring: leftStatus.acquired, appCount: leftStatus.apps.length,
+                        hovered: hover.hovered})
                 }
             }
             Timer {
@@ -336,7 +344,13 @@ Scope {
                 Item {
                 anchors.fill: parent
                 clip: true
-                HoverHandler { id: hover; onHoveredChanged: if (hovered) window.wake() }
+                HoverHandler {
+                    id: hover
+                    onHoveredChanged: {
+                        if (hovered) { window.wake(); closeTimer.stop() }
+                        else if (window.expanded) closeTimer.restart()
+                    }
+                }
                 Item {
                     id: compact
                     x: [0, 2, 0, -2][window.shift]
@@ -351,7 +365,7 @@ Scope {
                         visible: window.playing && !window.expanded
                     }
                     Text {
-                        visible: window.playing
+                        visible: window.mediaMode
                         anchors.centerIn: parent
                         text: window.time; color: "#d5d5d5"
                         font.pixelSize: 16; font.weight: Font.DemiBold
@@ -375,7 +389,7 @@ Scope {
                         }
                     }
                     Row {
-                        visible: !window.playing
+                        visible: !window.mediaMode
                         anchors.centerIn: parent
                         spacing: 24
                     Text {
@@ -430,7 +444,7 @@ Scope {
                 }
                 RowLayout {
                     anchors { top: parent.top; topMargin: 58; left: parent.left; right: parent.right; margins: 24 }
-                    visible: window.expanded && window.playing && !window.notice && !window.levelOpen
+                    visible: window.expanded && window.mediaMode && !window.notice && !window.levelOpen
                     spacing: 20
                     Cover {
                         Layout.preferredWidth: 94; Layout.preferredHeight: 94
